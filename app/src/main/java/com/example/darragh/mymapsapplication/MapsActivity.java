@@ -18,6 +18,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -88,15 +89,19 @@ public class MapsActivity extends Activity {
         return true;
     }
 
-    public void onClick_City(View v) {
+    public void onClick_Find(View v) {
 //		CameraUpdate update = CameraUpdateFactory.newLatLng(LOCATION_BURNABY);
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         LatLng MY_LOCATION = new LatLng(latitude, longitude);
-        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(MY_LOCATION, 15);
+        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(MY_LOCATION, 17);
+        //map.addMarker(new MarkerOptions().position(MY_LOCATION).title("Find me here!"));
+        map.addMarker(new MarkerOptions().position(MY_LOCATION)
+                .icon(BitmapDescriptorFactory
+                        .defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
         map.animateCamera(update);
     }
 
-    public void onClick_Surrey(View v) {
+    public void onClick_Track(View v) {
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         CameraUpdate update = CameraUpdateFactory.newLatLngZoom(LOCATION_SURRREY, 16);
         map.animateCamera(update);
