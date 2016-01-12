@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -13,6 +14,7 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,18 +23,22 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 public class MapsActivity extends Activity {
 
-    private final LatLng LOCATION_BURNABY = new LatLng(49.27645, -122.917587);
-    private final LatLng LOCATION_SURRREY = new LatLng(49.187500, -122.849000);
+    private final LatLng LOCATION_DUBLIN = new LatLng(53.359673, -6.317403);
 
     private double longitude;
     private double latitude;
 
+    private static LatLng prev;
+    private int flag=0;
+
     private GoogleMap map;
     private LocationManager locationManager;
     private LocationListener locationListener;
+    private PolylineOptions myPolylineOptions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,16 +46,32 @@ public class MapsActivity extends Activity {
         setContentView(R.layout.activity_maps);
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-        map.addMarker(new MarkerOptions().position(LOCATION_SURRREY).title("Find me here!"));
+        map.addMarker(new MarkerOptions().position(LOCATION_DUBLIN).title("Find me here!"));
 
         //Calling the Location Service
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
 
                 latitude = location.getLatitude();
                 longitude = location.getLongitude();
+
+                LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+
+                if(flag == 0)  //when the first update comes, we have no previous points,hence this
+                {
+                    prev = current;
+                    flag = 1;
+                }
+                CameraUpdate update = CameraUpdateFactory.newLatLngZoom(current, 16);
+                map.animateCamera(update);
+                map.addPolyline((new PolylineOptions())
+                        .add(prev, current).width(6).color(Color.BLUE)
+                        .visible(true));
+                prev = current;
+                current = null;
             }
 
             @Override
@@ -60,6 +82,7 @@ public class MapsActivity extends Activity {
             @Override
             public void onProviderEnabled(String provider) {
 
+                Toast.makeText(getBaseContext(), "GPS turned on ", Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -90,11 +113,11 @@ public class MapsActivity extends Activity {
     }
 
     public void onClick_Find(View v) {
-//		CameraUpdate update = CameraUpdateFactory.newLatLng(LOCATION_BURNABY);
+
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         LatLng MY_LOCATION = new LatLng(latitude, longitude);
         CameraUpdate update = CameraUpdateFactory.newLatLngZoom(MY_LOCATION, 17);
-        //map.addMarker(new MarkerOptions().position(MY_LOCATION).title("Find me here!"));
+
         map.addMarker(new MarkerOptions().position(MY_LOCATION)
                 .icon(BitmapDescriptorFactory
                         .defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
@@ -103,7 +126,7 @@ public class MapsActivity extends Activity {
 
     public void onClick_Track(View v) {
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(LOCATION_SURRREY, 16);
+        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(LOCATION_DUBLIN, 16);
         map.animateCamera(update);
     }
 }
