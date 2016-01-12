@@ -50,7 +50,7 @@ public class MapsActivity extends Activity {
 
         //Calling the Location Service
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        
+
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
