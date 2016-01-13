@@ -130,4 +130,3 @@ public class MapsActivity extends Activity {
         map.animateCamera(update);
     }
 }
-
